@@ -15,6 +15,7 @@ import { isNotNull } from "utils/typescript-utils";
 import { toast } from "@bobaboard/ui-components";
 import { useBoardMetadata } from "lib/api/hooks/board";
 import { useCachedLinks } from "components/hooks/useCachedLinks";
+import { useDebugOptions } from "./comment/useDebugOptions";
 import { useEditorsState } from "components/core/editors/EditorsContext";
 import { useThreadContext } from "components/thread/ThreadContext";
 import { useThreadEditors } from "components/core/editors/withEditors";
@@ -23,6 +24,7 @@ export enum CommentOptions {
   GO_TO_COMMENT = "GO_TO_COMMENT",
   COPY_COMMENT_LINK = "COPY_COMMENT_LINK",
   REPLY_TO_COMMENT = "REPLY_TO_COMMENT",
+  DEBUG = "DEBUG",
 }
 
 /**
@@ -59,6 +61,7 @@ export const useCommentOptions = ({
 
   const commentChain = getCommentsChain(comment, parentChainMap);
   const lastCommentChainId = commentChain[commentChain.length - 1].commentId;
+  const debugOptions = useDebugOptions({ comments: commentChain });
 
   // TODO: we should also return null if the editor is open
   const canReplyToComment =
@@ -107,6 +110,9 @@ export const useCommentOptions = ({
                 },
               };
             }
+            case CommentOptions.DEBUG: {
+              return debugOptions;
+            }
           }
         })
         // Filter out the options that are not available (and thus have returned
@@ -119,6 +125,7 @@ export const useCommentOptions = ({
       linkToComment,
       onNewComment,
       parentPostId,
+      debugOptions,
     ]
   );
 };
